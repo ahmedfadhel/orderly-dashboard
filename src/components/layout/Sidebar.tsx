@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  ShoppingBasket,
   Users,
   Percent,
   BarChart3,
@@ -25,6 +26,7 @@ interface SidebarProps {
 const navItems = [
   { path: '/dashboard', label: 'لوحة التحكم', icon: LayoutDashboard },
   { path: '/products', label: 'المنتجات', icon: Package },
+  { path: '/cart', label: 'السلات', icon: ShoppingBasket },
   { path: '/orders', label: 'الطلبات', icon: ShoppingCart },
   { path: '/customers', label: 'العملاء', icon: Users },
   { path: '/discounts', label: 'الخصومات', icon: Percent },
