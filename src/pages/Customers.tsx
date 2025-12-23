@@ -1,15 +1,34 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users } from 'lucide-react';
+import { Plus, Search, Users } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CustomerDrawer } from '@/components/customers/CustomerDrawer';
 import { customers, formatCurrency, formatDate, type Customer } from '@/lib/mockData';
 
 const Customers = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+
+  const openAddDrawer = () => {
+    setEditingCustomer(null);
+    setDrawerOpen(true);
+  };
+
+  const openEditDrawer = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setDrawerOpen(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setEditingCustomer(null);
+  };
 
   // Filter customers
   const filteredCustomers = customers.filter(customer => {
@@ -83,6 +102,12 @@ const Customers = () => {
           { label: 'لوحة التحكم', href: '/dashboard' },
           { label: 'العملاء' },
         ]}
+        actions={
+          <Button onClick={openAddDrawer}>
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة عميل
+          </Button>
+        }
       />
 
       {/* Search */}
@@ -106,6 +131,14 @@ const Customers = () => {
           description={search
             ? 'لا توجد نتائج تطابق معايير البحث'
             : 'لم يتم تسجيل أي عملاء بعد'}
+          action={
+            search
+              ? undefined
+              : {
+                  label: 'إضافة عميل',
+                  onClick: openAddDrawer,
+                }
+          }
         />
       ) : (
         <DataTable
@@ -114,10 +147,14 @@ const Customers = () => {
           keyExtractor={(customer) => customer.id}
           onRowClick={(customer) => navigate(`/customers/${customer.id}`)}
           actions={[
+            { label: 'تعديل', onClick: (customer) => openEditDrawer(customer) },
             { label: 'عرض الملف الشخصي', onClick: (customer) => navigate(`/customers/${customer.id}`) },
           ]}
         />
       )}
+
+      {/* Customer Drawer */}
+      <CustomerDrawer open={drawerOpen} onClose={closeDrawer} customer={editingCustomer} />
     </div>
   );
 };
