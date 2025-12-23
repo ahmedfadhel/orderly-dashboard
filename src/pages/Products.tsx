@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Filter, Package } from 'lucide-react';
+import { Plus, Search, Package } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DataTable } from '@/components/ui/DataTable';
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ProductDrawer } from '@/components/products/ProductDrawer';
 import { products, formatCurrency, formatDate, type Product } from '@/lib/mockData';
 
 const Products = () => {
@@ -21,6 +22,7 @@ const Products = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Get unique categories
   const categories = [...new Set(products.map(p => p.category))];
@@ -110,7 +112,7 @@ const Products = () => {
           { label: 'المنتجات' },
         ]}
         actions={
-          <Button onClick={() => navigate('/products/new')}>
+          <Button onClick={() => setDrawerOpen(true)}>
             <Plus className="w-4 h-4 ml-2" />
             إضافة منتج
           </Button>
@@ -174,7 +176,7 @@ const Products = () => {
               ? undefined
               : {
                   label: 'إضافة منتج',
-                  onClick: () => navigate('/products/new'),
+                  onClick: () => setDrawerOpen(true),
                 }
           }
         />
@@ -191,6 +193,9 @@ const Products = () => {
           ]}
         />
       )}
+
+      {/* Product Drawer */}
+      <ProductDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 };
