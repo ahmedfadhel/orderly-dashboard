@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,10 +20,12 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
+import type { Product } from '@/lib/mockData';
 
 interface ProductDrawerProps {
   open: boolean;
   onClose: () => void;
+  product?: Product | null;
 }
 
 interface Variant {
@@ -60,21 +62,57 @@ const vendors = [
   'مختبرات الجمال الطبيعي',
 ];
 
-export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
+const getInitialVariants = (product?: Product | null): Variant[] => {
+  if (product && product.variants.length > 0) {
+    return product.variants.map((v) => ({
+      id: v.id,
+      option1: v.option1 || '',
+      option2: v.option2 || '',
+      sku: v.sku || '',
+      price: v.price?.toString() || '',
+      compareAtPrice: v.compareAtPrice?.toString() || '',
+      cost: v.cost?.toString() || '',
+      stock: v.stock?.toString() || '',
+    }));
+  }
+  return [{
+    id: '1',
+    option1: '',
+    option2: '',
+    sku: '',
+    price: '',
+    compareAtPrice: '',
+    cost: '',
+    stock: '',
+  }];
+};
+
+export const ProductDrawer = ({ open, onClose, product }: ProductDrawerProps) => {
   const [activeTab, setActiveTab] = useState('basic');
   const [trackInventory, setTrackInventory] = useState(true);
-  const [variants, setVariants] = useState<Variant[]>([
-    {
-      id: '1',
-      option1: '',
-      option2: '',
-      sku: '',
-      price: '',
-      compareAtPrice: '',
-      cost: '',
-      stock: '',
-    },
-  ]);
+  const [variants, setVariants] = useState<Variant[]>(getInitialVariants(product));
+
+  // Form state
+  const [title, setTitle] = useState(product?.title || '');
+  const [description, setDescription] = useState(product?.description || '');
+  const [status, setStatus] = useState(product?.status || 'draft');
+  const [category, setCategory] = useState(product?.category || '');
+  const [vendor, setVendor] = useState(product?.vendor || '');
+
+  const isEditing = !!product;
+
+  // Reset form when product changes or drawer opens/closes
+  useEffect(() => {
+    if (open) {
+      setTitle(product?.title || '');
+      setDescription(product?.description || '');
+      setStatus(product?.status || 'draft');
+      setCategory(product?.category || '');
+      setVendor(product?.vendor || '');
+      setVariants(getInitialVariants(product));
+      setActiveTab('basic');
+    }
+  }, [open, product]);
 
   const addVariant = () => {
     setVariants([
@@ -107,8 +145,8 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: 'تم إضافة المنتج',
-      description: 'تمت إضافة المنتج بنجاح إلى المتجر',
+      title: isEditing ? 'تم تحديث المنتج' : 'تم إضافة المنتج',
+      description: isEditing ? 'تم تحديث بيانات المنتج بنجاح' : 'تمت إضافة المنتج بنجاح إلى المتجر',
     });
     onClose();
   };
@@ -122,7 +160,7 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="p-6 border-b border-border sticky top-0 bg-card z-10">
             <div className="flex items-center justify-between">
-              <SheetTitle className="font-heading text-xl">إضافة منتج جديد</SheetTitle>
+              <SheetTitle className="font-heading text-xl">{isEditing ? 'تعديل المنتج' : 'إضافة منتج جديد'}</SheetTitle>
               <Button
                 type="button"
                 variant="ghost"
@@ -152,6 +190,8 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
                       id="title"
                       placeholder="مثال: قميص قطني كلاسيكي"
                       className="mt-1.5"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                       required
                     />
                   </div>
@@ -162,13 +202,15 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
                       id="description"
                       placeholder="أضف وصفاً تفصيلياً للمنتج..."
                       className="mt-1.5 min-h-[120px]"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="status">الحالة</Label>
-                      <Select defaultValue="draft">
+                      <Select value={status} onValueChange={(val) => setStatus(val as 'draft' | 'active' | 'archived')}>
                         <SelectTrigger className="mt-1.5">
                           <SelectValue />
                         </SelectTrigger>
@@ -182,7 +224,7 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
 
                     <div>
                       <Label htmlFor="category">الفئة</Label>
-                      <Select>
+                      <Select value={category} onValueChange={setCategory}>
                         <SelectTrigger className="mt-1.5">
                           <SelectValue placeholder="اختر الفئة" />
                         </SelectTrigger>
@@ -199,14 +241,14 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
 
                   <div>
                     <Label htmlFor="vendor">المورد</Label>
-                    <Select>
+                    <Select value={vendor} onValueChange={setVendor}>
                       <SelectTrigger className="mt-1.5">
                         <SelectValue placeholder="اختر المورد" />
                       </SelectTrigger>
                       <SelectContent>
-                        {vendors.map((vendor) => (
-                          <SelectItem key={vendor} value={vendor}>
-                            {vendor}
+                        {vendors.map((v) => (
+                          <SelectItem key={v} value={v}>
+                            {v}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -442,7 +484,7 @@ export const ProductDrawer = ({ open, onClose }: ProductDrawerProps) => {
                 إلغاء
               </Button>
               <Button type="submit" className="flex-1">
-                حفظ المنتج
+                {isEditing ? 'حفظ التعديلات' : 'حفظ المنتج'}
               </Button>
             </div>
           </div>

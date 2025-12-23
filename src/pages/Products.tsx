@@ -23,6 +23,22 @@ const Products = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const openAddDrawer = () => {
+    setEditingProduct(null);
+    setDrawerOpen(true);
+  };
+
+  const openEditDrawer = (product: Product) => {
+    setEditingProduct(product);
+    setDrawerOpen(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setEditingProduct(null);
+  };
 
   // Get unique categories
   const categories = [...new Set(products.map(p => p.category))];
@@ -112,7 +128,7 @@ const Products = () => {
           { label: 'المنتجات' },
         ]}
         actions={
-          <Button onClick={() => setDrawerOpen(true)}>
+          <Button onClick={openAddDrawer}>
             <Plus className="w-4 h-4 ml-2" />
             إضافة منتج
           </Button>
@@ -176,7 +192,7 @@ const Products = () => {
               ? undefined
               : {
                   label: 'إضافة منتج',
-                  onClick: () => setDrawerOpen(true),
+                  onClick: openAddDrawer,
                 }
           }
         />
@@ -187,7 +203,7 @@ const Products = () => {
           keyExtractor={(product) => product.id}
           onRowClick={(product) => navigate(`/products/${product.id}`)}
           actions={[
-            { label: 'تعديل', onClick: (product) => navigate(`/products/${product.id}`) },
+            { label: 'تعديل', onClick: (product) => openEditDrawer(product) },
             { label: 'نسخ', onClick: (product) => console.log('Copy', product.id) },
             { label: 'أرشفة', onClick: (product) => console.log('Archive', product.id), variant: 'destructive' },
           ]}
@@ -195,7 +211,7 @@ const Products = () => {
       )}
 
       {/* Product Drawer */}
-      <ProductDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <ProductDrawer open={drawerOpen} onClose={closeDrawer} product={editingProduct} />
     </div>
   );
 };
