@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import {
   Search,
   Bell,
@@ -33,7 +32,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-card border-b border-border">
+    <header className="sticky top-0 z-30 h-16 bg-card border-b border-border shrink-0">
       <div className="flex items-center justify-between h-full px-4 lg:px-6">
         {/* Right Section */}
         <div className="flex items-center gap-3">
@@ -41,7 +40,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden touch-target"
+            className="lg:hidden min-h-[44px] min-w-[44px]"
             onClick={onMenuClick}
           >
             <Menu className="w-5 h-5" />
@@ -60,7 +59,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden touch-target"
+            className="md:hidden min-h-[44px] min-w-[44px]"
             onClick={() => setShowSearch(!showSearch)}
           >
             <Search className="w-5 h-5" />
@@ -93,7 +92,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           </DropdownMenu>
 
           {/* Mobile Add Button */}
-          <Button variant="default" size="icon" className="sm:hidden touch-target">
+          <Button variant="default" size="icon" className="sm:hidden min-h-[44px] min-w-[44px]">
             <Plus className="w-5 h-5" />
           </Button>
 
@@ -102,7 +101,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="touch-target"
+            className="min-h-[44px] min-w-[44px]"
           >
             {theme === 'light' ? (
               <Moon className="w-5 h-5" />
@@ -114,7 +113,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative touch-target">
+              <Button variant="ghost" size="icon" className="relative min-h-[44px] min-w-[44px]">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2 left-2 w-2 h-2 bg-destructive rounded-full" />
               </Button>
@@ -130,7 +129,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="touch-target">
+              <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="w-4 h-4 text-primary" />
                 </div>
