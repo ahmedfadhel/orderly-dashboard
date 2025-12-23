@@ -6,10 +6,28 @@ import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { DiscountDrawer } from '@/components/discounts/DiscountDrawer';
 import { discounts, formatCurrency, formatDate, type Discount } from '@/lib/mockData';
 
 const Discounts = () => {
   const [activeTab, setActiveTab] = useState('coupons');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
+
+  const openAddDrawer = () => {
+    setEditingDiscount(null);
+    setDrawerOpen(true);
+  };
+
+  const openEditDrawer = (discount: Discount) => {
+    setEditingDiscount(discount);
+    setDrawerOpen(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setEditingDiscount(null);
+  };
 
   const getDiscountTypeIcon = (type: Discount['type']) => {
     switch (type) {
@@ -111,7 +129,7 @@ const Discounts = () => {
           { label: 'الخصومات' },
         ]}
         actions={
-          <Button>
+          <Button onClick={openAddDrawer}>
             <Plus className="w-4 h-4 ml-2" />
             إنشاء خصم
           </Button>
@@ -132,7 +150,7 @@ const Discounts = () => {
               description="أنشئ كود خصم لعملائك"
               action={{
                 label: 'إنشاء خصم',
-                onClick: () => console.log('Create discount'),
+                onClick: openAddDrawer,
               }}
             />
           ) : (
@@ -141,7 +159,7 @@ const Discounts = () => {
               columns={columns}
               keyExtractor={(discount) => discount.id}
               actions={[
-                { label: 'تعديل', onClick: (discount) => console.log('Edit', discount.id) },
+                { label: 'تعديل', onClick: (discount) => openEditDrawer(discount) },
                 { label: 'نسخ الكود', onClick: (discount) => navigator.clipboard.writeText(discount.code) },
                 { label: 'إيقاف', onClick: (discount) => console.log('Disable', discount.id), variant: 'destructive' },
               ]}
@@ -156,11 +174,14 @@ const Discounts = () => {
             description="الخصومات التلقائية تطبق بدون كود"
             action={{
               label: 'إنشاء خصم تلقائي',
-              onClick: () => console.log('Create automatic discount'),
+              onClick: openAddDrawer,
             }}
           />
         </TabsContent>
       </Tabs>
+
+      {/* Discount Drawer */}
+      <DiscountDrawer open={drawerOpen} onClose={closeDrawer} discount={editingDiscount} />
     </div>
   );
 };
