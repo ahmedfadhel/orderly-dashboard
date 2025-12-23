@@ -49,8 +49,8 @@ export const Sidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-0 right-0 h-full bg-sidebar z-50 transition-all duration-300 flex flex-col border-l border-sidebar-border',
-          'lg:relative lg:z-30',
+          'fixed top-0 right-0 h-screen bg-sidebar z-50 transition-all duration-300 flex flex-col border-l border-sidebar-border',
+          'lg:sticky lg:top-0 lg:z-30 lg:h-screen',
           isCollapsed ? 'w-20' : 'w-64',
           isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         )}
